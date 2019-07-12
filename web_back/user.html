@@ -39,23 +39,23 @@
                         <input type="text" class="form-control" id="inputEmail3" name="email" value="lisisi@126.com">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
-                        <img src="images/2.jpg" alt="" class="user_pic" >
+                        <img src="images/2.jpg" alt="" class="user_pic">
                         <input type="file" name="user_pic" id="exampleInputFile">
                     </div>
                 </div>
 
                 <div class="form-group">
-                        <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
-                        <div class="col-sm-4">
-                            <input type="password" class="form-control" id="inputEmail4" name="password" value="12345678">
-                        </div>
+                    <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="inputEmail4" name="password" value="12345678">
                     </div>
-               
-    
+                </div>
+
+
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
                         <button type="submit" class="btn btn-success">修改</button>
@@ -64,51 +64,51 @@
             </form>
         </div>
     </div>
-   
-     <script> 
-             //编辑用户信息
-             $(function(){
-                 //1.获取用户信息
-                 $.ajax({
-                      type: 'get',
-                      url: 'http://localhost:8000/admin/userinfo_get',
-                      success: function(res){
-                        
-                           if(res.code == 200){
-                            $('#inputEmail1').val(res.data.username)
-                            $('#inputEmail2').val(res.data.nickname)
-                            $('#inputEmail3').val(res.data.email)
-                            $('.user_pic').attr('src', res.data.user_pic)  
-                            $('#inputEmail4').val(res.data.password)
-                           }
-                      }
-                 })
-                  
-                  //点击修改发送ajax请求
-                $('.btn-success').click(function(){
-                     //获取用户编辑的信息
-                    var fm = new FormData($('form')[0]);
-                    
-                    $.post({
-                      url: 'http://localhost:8000/admin/userinfo_edit',
-                      data: fm,
-                      contentType: false,
-                      processData: false,
-                      success: function(res){
-                          console.log(res);
-                          
-                          if(res.code == 200){
+
+    <script>
+        //编辑用户信息
+        $(function () {
+            //1.获取用户信息
+            $.ajax({
+                type: 'get',
+                url: 'http://localhost:8000/admin/userinfo_get',
+                success: function (res) {
+
+                    if (res.code == 200) {
+                        $('#inputEmail1').val(res.data.username)
+                        $('#inputEmail2').val(res.data.nickname)
+                        $('#inputEmail3').val(res.data.email)
+                        $('.user_pic').attr('src', res.data.user_pic)
+                        $('#inputEmail4').val(res.data.password)
+                    }
+                }
+            })
+
+            //点击修改发送ajax请求
+            $('.btn-success').click(function () {
+                //获取用户编辑的信息
+                var fm = new FormData($('form')[0]);
+
+                $.post({
+                    url: 'http://localhost:8000/admin/userinfo_edit',
+                    data: fm,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        console.log(res);
+
+                        if (res.code == 200) {
                             // $('.user_pic').attr('src',user_pic) 
-                          }
-                      }
-                 }) 
+                        }
+                    }
                 })
-             })
-     </script>
+            })
+        })
+    </script>
 </body>
 
 </html>
 
- <!-- 
+<!-- 
                  
   -->
