@@ -105,36 +105,36 @@
     </script>
    
     <script>
-        //   $(function(){
-        //      //1.点击退出 
-        //      $('.icon-tuichu').parent().on('click', function(e){
-        //           e.preventDefault();
+          $(function(){
+             //1.点击退出 
+             $('.icon-tuichu').parent().on('click', function(e){
+                  e.preventDefault();
                   
-        //           $.post({
-        //               url: 'http://localhost:8000/admin/logout',
-        //               success: function(res){
-        //                  if(res.code == 200){
-        //                     window.location.href = './login.html'; 
-        //                  } 
-        //               }
-        //           })
-        //      });
+                  $.post({
+                      url: 'http://localhost:8000/admin/logout',
+                      success: function(res){
+                         if(res.code == 200){
+                            window.location.href = './login.html'; 
+                         } 
+                      }
+                  })
+             });
 
-        //    //2.获取用户信息
-        //    $.ajax({
-        //        type: 'get', // 默认是get,可以省略不写
-        //         url: 'http://localhost:8000/admin/getuser',
-        //         success: function(res){
-        //             if(res.code == 200){
-        //                $('.user_center_link').children('img').attr('src', res.data.user_pic);
-        //                $('.user_info').children('span').html('欢迎&nbsp;&nbsp;' + res.data.nickname);
-        //                $('.user_info').children('img').attr('src', res.data.user_pic);
+           //2.获取用户信息
+           $.ajax({
+               type: 'get', // 默认是get,可以省略不写
+                url: 'http://localhost:8000/admin/getuser',
+                success: function(res){
+                    if(res.code == 200){
+                       $('.user_center_link').children('img').attr('src', res.data.user_pic);
+                       $('.user_info').children('span').html('欢迎&nbsp;&nbsp;' + res.data.nickname);
+                       $('.user_info').children('img').attr('src', res.data.user_pic);
 
-        //             }
-        //         }
-        //    })
+                    }
+                }
+           })
             
-        //   })
+          })
     </script>
 </body>
 </html>
