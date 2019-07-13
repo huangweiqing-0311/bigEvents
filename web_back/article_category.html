@@ -139,6 +139,19 @@
           </tr>
         {{/each}}
      </script>
+     <!-- 模板2 -->
+     <script type="text/html" id="tmp2">
+      <tr>
+        <td>{{ name}}</td>
+        <td>{{ slug}}</td>
+        <td class="text-center">
+            <a href="javascript:editTr({&quot;id&quot;:&quot;1&quot;,&quot;slug&quot;:&quot;uncategorized&quot;,&quot;name&quot;:&quot;未分类&quot;});"
+                class="btn btn-info btn-xs">编辑</a>
+            <a href="javascript:deleteTr( {{id}} );" class="btn btn-danger btn-xs">删除</a>
+        </td>
+      </tr>
+    </script>
+
   <!-- 自己的逻辑 -->
   <script>
     /*
@@ -211,19 +224,25 @@
         success: function (res) {
             console.log(res);
           if (res.code == 200) {
-            //隐藏模态框
-             $('#addModal').modal('hide');
+            var obj = {
+              name: cateName,
+              slug: cateSlug,
+            } 
+            var html2 = template('tmp2', obj);
+            $('tbody').append(html2); 
             //重新获取数据
-            getData(); 
+            //getData();//性能不高,不用
           }
         }
-      });
+      }); 
+      //隐藏模态框        
+       $('#addModal').modal('hide');
 
       })
 
     //3.分类删除
      window.deleteTr = function(id){
-        //console.log(id);
+        console.log(id);
         //调用接口
         $.ajax({
             url: 'http://localhost:8000/admin/category_delete',
