@@ -24,19 +24,19 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail1" name="username" value="李思思">
+                        <input type="text" class="form-control username"  name="username" value="李思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail2" name="nickname" value="思思">
+                        <input type="text" class="form-control nickname"  name="nickname" value="思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" name="email" value="lisisi@126.com">
+                        <input type="text" class="form-control email"  name="email" value="lisisi@126.com">
                     </div>
                 </div>
 
@@ -51,7 +51,7 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
-                        <input type="password" class="form-control" id="inputEmail4" name="password" value="12345678">
+                        <input type="password" class="form-control password"  name="password" value="12345678">
                     </div>
                 </div>
 
@@ -68,21 +68,40 @@
     <script>
         //编辑用户信息
         $(function () {
+             //图片预览
+             $('#exampleInputFile').change(function(){
+                //files是dom元素的属性
+                var file = this.files[0];
+                //生成临时url
+                var url = URL.createObjectURL(file);
+                //赋值给img
+                $('.user_pic').attr('src', url);
+                // $(this).siblings('img').attr('src', url);
+            })
+
             //1.获取用户信息
             $.ajax({
                 type: 'get',
                 url: 'http://localhost:8000/admin/userinfo_get',
                 success: function (res) {
-
+                    console.log(res.data);
                     if (res.code == 200) {
-                        $('#inputEmail1').val(res.data.username)
-                        $('#inputEmail2').val(res.data.nickname)
-                        $('#inputEmail3').val(res.data.email)
-                        $('.user_pic').attr('src', res.data.user_pic)
-                        $('#inputEmail4').val(res.data.password)
+                        // $('#inputEmail1').val(res.data.username)
+                        // $('#inputEmail2').val(res.data.nickname)
+                        // $('#inputEmail3').val(res.data.email)
+                        // $('.user_pic').attr('src', res.data.user_pic)
+                        // $('#inputEmail4').val(res.data.password)
+                        
+                        //把返回的数据显示到对应的标签
+                        for(const key in res.data){
+                           $('input.' + key).val(res.data[key]); 
+                        }
+                        $('.user_pic').attr('src', res.data.user_pic);
                     }
-                }
-            })
+                  }
+              })
+
+            
 
             //点击修改发送ajax请求
             $('.btn-success').click(function () {
