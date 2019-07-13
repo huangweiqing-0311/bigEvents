@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="js/jquery-1.12.4.min.js"></script>
-
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -24,19 +24,19 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control username"  name="username" value="李思思">
+                        <input type="text" class="form-control username" name="username" value="李思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control nickname"  name="nickname" value="思思">
+                        <input type="text" class="form-control nickname" name="nickname" value="思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control email"  name="email" value="lisisi@126.com">
+                        <input type="text" class="form-control email" name="email" value="lisisi@126.com">
                     </div>
                 </div>
 
@@ -44,32 +44,56 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input type="file" name="user_pic" id="exampleInputFile">
+                        <input type="file" name="user_pic" id="exampleInputFile" style="display: none">
+                        <br>
+                        <label for="exampleInputFile">
+                            <img src="./images/uploadFileIcon.png" alt="">
+                        </label>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
                     <div class="col-sm-4">
-                        <input type="password" class="form-control password"  name="password" value="12345678">
+                        <input type="password" class="form-control password" name="password" value="12345678">
                     </div>
                 </div>
 
 
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">修改</button>
+                        <button type="submit" class="btn btn-success btn-edit">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">温馨提示</h4>
+                </div>
+                <div class="modal-body">
+                    修改成功
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         //编辑用户信息
         $(function () {
-             //图片预览
-             $('#exampleInputFile').change(function(){
+            //图片预览
+            $('#exampleInputFile').change(function () {
                 //files是dom元素的属性
                 var file = this.files[0];
                 //生成临时url
@@ -79,7 +103,7 @@
                 // $(this).siblings('img').attr('src', url);
             })
 
-            //1.获取用户信息
+            //1.获取用户信息(一进到页面,获取个人信息,显示到页面上)
             $.ajax({
                 type: 'get',
                 url: 'http://localhost:8000/admin/userinfo_get',
@@ -91,20 +115,24 @@
                         // $('#inputEmail3').val(res.data.email)
                         // $('.user_pic').attr('src', res.data.user_pic)
                         // $('#inputEmail4').val(res.data.password)
-                        
+
                         //把返回的数据显示到对应的标签
-                        for(const key in res.data){
-                           $('input.' + key).val(res.data[key]); 
+                        for (const key in res.data) {
+                            $('input.' + key).val(res.data[key]);
                         }
                         $('.user_pic').attr('src', res.data.user_pic);
                     }
-                  }
-              })
+                }
+            })
 
-            
 
-            //点击修改发送ajax请求
-            $('.btn-success').click(function () {
+
+            //2.[需求]:修改用户信息
+            //2.1-点击修改发送ajax请求
+            $('.btn-edit').on('click', function (e) {
+                //去掉事件的默认行为(跳转)
+                e.preventDefault();
+
                 //获取用户编辑的信息
                 var fm = new FormData($('form')[0]);
 
@@ -115,9 +143,29 @@
                     processData: false,
                     success: function (res) {
                         console.log(res);
-
                         if (res.code == 200) {
-                            // $('.user_pic').attr('src',user_pic) 
+                            //    父窗口刷新
+                            // parent.location.reload(); // 
+                            //    修改成功
+                            $('#myModal').modal();
+                            //给确认按钮设置一个点击事件
+                            $('.btn-primary').on('click', function () {
+                                $('#myModal').modal('hide');
+
+                                //2.2-再次发送ajax请求,获取用户信息渲染到父窗口对应的标签中
+                                $.ajax({
+                                    type: 'get', // 默认是get,可以省略不写
+                                    url: 'http://localhost:8000/admin/getuser',
+                                    success: function (res) {
+                                        if (res.code == 200) {
+                                            parent.$('.user_center_link').children('img').attr('src', res.data.user_pic);
+                                            parent.$('.user_info').children('span').html('欢迎&nbsp;&nbsp;' + res.data.nickname);
+                                            parent.$('.user_info').children('img').attr('src', res.data.user_pic);
+                                       }
+                                    }
+                                })
+                            })
+
                         }
                     }
                 })
@@ -129,5 +177,5 @@
 </html>
 
 <!-- 
-                 
+                
   -->
