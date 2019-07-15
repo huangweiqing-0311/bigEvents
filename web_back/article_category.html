@@ -69,7 +69,7 @@
         <tfoot>
           <tr>
             <td colspan="3" class="text-center">
-              <a href="#" class="btn btn-add" data-toggle="modal" data-target="#addModal">新增分类</a>
+              <a href="#" class="btn btn-add btn-success btnAddCate" data-toggle="modal" data-target="#addModal">新增分类</a>
             </td>
           </tr>
         </tfoot>
@@ -135,7 +135,7 @@
             <td>{{$value.name}}</td>
             <td>{{$value.slug}}</td>
             <td class="text-center">
-                <a href="#" data-id="{{$value.id}}" class="btn btn-info btn-xs btn-success">编辑</a>
+                <a href="#" data-id="{{$value.id}}" class="btn btn-info btn-xs btn-edit">编辑</a>
                 <a href="#" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
             </td>
           </tr>
@@ -156,42 +156,33 @@
  <!-- javascript:deleteTr( {{$value.id}} ); -->
   <!-- 自己的逻辑 -->
   <script>
-    /*
-        获取文章分类信息
-          请求地址：http://localhost:8000/admin/category_search
-          请求方式：get
-          请求参数：无
-          步骤
-          1. 进入页面之后
-          2. 通过ajax获取数据
-          3. 数据获取到之后渲染到页面上
-              1. 结合模板引擎来渲染
-              文章新增
+     /*
+       1.获取文章分类数据显示到页面上-发送ajax请求
 
-      新增分类
-          请求地址：http://localhost:8000/admin/category_add
-          请求方式：post
-          请求参数：
-          步骤
-          1. 点击新增按钮 弹出新增框
-          2. 新增框中输入 name和slug
-          1. 点击取消 关闭
-          2. 点击新增  
-              1. 获取数据
-              2. 调用接口
-              3. 响应回来之后
+       2.给模态框的新增按钮添加点击事件
+        2.0隐藏模态框
+        2.1获取用户输入的数据,发送ajax请求,成功后重新渲染页面,为了取得最新数据,
+      
+       3.给删除的按钮设置委托事件
+        3.1在模板里给每一个按钮设置一个自定义属性data-id,方便获取到他
+        3.2通过tbody给删除按钮设置点击事件,并且阻止事件默认行为
+        3.3保存当前点击的this,并且获取id
+        3.3发送ajax请求,通过that找打它要删除的元素
 
-        分类删除
-          请求地址：http://localhost:8000/admin/category_delete
-          请求方式：post
-          请求参数：id
-          步骤
-          1. 生成每一行的时候，把id到deleteTr()
-          2. 实现deleteTr方法 获取id
-          3. 通过ajax删除对应的数据
-          4. 删除成功之后 重新获取数据（局部刷新）
+      4.点击编辑的事件
+        4.0隐藏模态框
+        4.1给编辑按钮设置一个btn-success属性[因为它和新增用的都是同一个弹出框,做判断用]  
+        4.2获取要修改的内容, id,name,slug,把它们赋值给弹出框对应的标签中,
+        4.3发送ajax请求,用serialize的方法获取表单元素的name属性--拼接成字符串
+        4.4修改成功,重新渲染页面
+        4.5用事件委托的方法给编辑按钮添加点击事件,并且添加一个btn-success类,并且修改model_add文本按钮内容
+        
 
-        */
+      5.点击新增按钮时,要移出弹出框的btn-success类
+        
+         
+           
+     */
 
     //1.获取文章分类数据显示到页面上--封装成函数
     function getData() {
@@ -216,9 +207,9 @@
       //2.1点击编辑-判断这个按钮是否拥有btn-success属性[有-编辑]
       if ($(this).hasClass('btn-success')) {
           //获取用户要修改的内容
-          var name = $('#recipient-name').val();  // 获取分类名称
-          var slug = $('#recipient-slug').val();  //获取分类别名
-          var id = $('.modal-body .id').val();
+          // var name = $('#recipient-name').val();  // 获取分类名称
+          // var slug = $('#recipient-slug').val();  //获取分类别名
+          // var id = $('.modal-body .id').val();
           //console.log(id);
           //使用serialize的方法(jQuery)获取表单元素的name属性
           var data = $(".modal-body form").serialize();  // 拼接成字符串
@@ -268,29 +259,15 @@
 
       })
 
-    //3.分类删除
-    //  window.deleteTr = function(id){
-    //     console.log(id);
-    //     //调用接口
-    //     $.ajax({
-    //         url: 'http://localhost:8000/admin/category_delete',
-    //         type: 'post',
-    //         data: { id : id},
-    //         success: function (res) {
-    //              if(res.code == 200){
-    //                 //重新调用获取数据
-    //                 getData();
-    //              }
-    //         }
-    //     })
-    //  }
-    
+      
     //[需求]: 点击新增分类按钮, 模态框中的按钮还原
-    $('.btn-add').on('click', function(){
+    $('.btnAddCate').on('click', function(){
+      $('#addModal .modal-title').html('新增分类'); 
       $('#model_add').text('新增').removeClass('btn-success'); 
     })
+
     //[需求]: 事件委托的方法编辑用户信息
-    $('tbody').on('click', '.btn-info', function(){
+    $('tbody').on('click', '.btn-edit', function(){
         $('#addModal .modal-title').html('修改分类名称')
         $('#addModal').modal('show')
         $('#model_add').addClass('btn-success').text('修改') 
@@ -310,7 +287,7 @@
     //[需求]: 事件委托的方法来删除
      $('tbody').on('click', '.btn-delete', function(e){
             e.preventDefault();
-            console.log('删除吗');
+             
             if(confirm('你确认要删除吗?')){
                 //获取当前要删除的这个项的id
                 var cateId = $(this).attr('data-id');
@@ -323,7 +300,8 @@
                     success: function(res){
                        if(res.code == 200){
                          //删除成功,刷新页面
-                          getData();
+                          // getData();
+                          that.parents('tr').remove();
                        }
                     }
                 })

@@ -87,12 +87,28 @@
             </div>
         </div>
     </div>
+     
+    <!-- 1.图片预览
+           1.1用操作dom树的files[0]方法获取要当前的元素
+           1.2转换成临时路径,赋值给对应的图片标签
+           
+        2.获取用户信息
+          2.1发送ajax请求
+          2.2把成功返回来的数据渲染到页面上
+          2.3可以用for-in的方法遍历对象把对应值付给对应的标签[先给每一个要显示数据的标签设置与返回数据属性名对应的类]
 
+        3.修改用户信息
+          3.1点击修改按钮,获取用户编辑的信息(用formData的方法获取)
+          3.2发送ajax请求post--不用设置请求头,但是要contentType: false,
+                                                  processData: false,
+          3.3修改成功,显示模态框
+          3.4点击确认,再次发送ajax请求,获取最新的数据,并且把数据添加到父窗口对应的标签中(parent)
 
+         -->
     <script>
         //编辑用户信息
         $(function () {
-            //图片预览
+            //1.图片预览
             $('#exampleInputFile').change(function () {
                 //files是dom元素的属性
                 var file = this.files[0];
@@ -103,7 +119,7 @@
                 // $(this).siblings('img').attr('src', url);
             })
 
-            //1.获取用户信息(一进到页面,获取个人信息,显示到页面上)
+            //2.获取用户信息(一进到页面,获取个人信息,显示到页面上)
             $.ajax({
                 type: 'get',
                 url: 'http://localhost:8000/admin/userinfo_get',
@@ -127,8 +143,8 @@
 
 
 
-            //2.[需求]:修改用户信息
-            //2.1-点击修改发送ajax请求
+            //3.[需求]:修改用户信息
+            //3.1-点击修改发送ajax请求
             $('.btn-edit').on('click', function (e) {
                 //去掉事件的默认行为(跳转)
                 e.preventDefault();
@@ -158,6 +174,7 @@
                                     url: 'http://localhost:8000/admin/getuser',
                                     success: function (res) {
                                         if (res.code == 200) {
+                                            //把修改成功返回的数据加到父窗口对应的标签中
                                             parent.$('.user_center_link').children('img').attr('src', res.data.user_pic);
                                             parent.$('.user_info').children('span').html('欢迎&nbsp;&nbsp;' + res.data.nickname);
                                             parent.$('.user_info').children('img').attr('src', res.data.user_pic);
