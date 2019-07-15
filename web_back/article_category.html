@@ -29,7 +29,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <!-- <tr>
             <td>未分类</td>
             <td>uncategorized</td>
             <td class="text-center">
@@ -64,7 +64,7 @@
               <a href='javascript:editTr({"id":"4","slug":"travel","name":"爱旅行"});' class="btn btn-info btn-xs">编辑</a>
               <a href="javascript:deleteTr( 4 );" class="btn btn-danger btn-xs">删除</a>
             </td>
-          </tr>
+          </tr> -->
         </tbody>
         <tfoot>
           <tr>
@@ -134,24 +134,24 @@
             <td class="text-center">
                 <a href="javascript:editTr({&quot;id&quot;:&quot;1&quot;,&quot;slug&quot;:&quot;uncategorized&quot;,&quot;name&quot;:&quot;未分类&quot;});"
                     class="btn btn-info btn-xs">编辑</a>
-                <a href="javascript:deleteTr( {{$value.id}} );" class="btn btn-danger btn-xs">删除</a>
+                <a href="#" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
             </td>
           </tr>
         {{/each}}
      </script>
      <!-- 模板2 -->
-     <script type="text/html" id="tmp2">
+     <!-- <script type="text/html" id="tmp2">
       <tr>
         <td>{{ name}}</td>
         <td>{{ slug}}</td>
         <td class="text-center">
             <a href="javascript:editTr({&quot;id&quot;:&quot;1&quot;,&quot;slug&quot;:&quot;uncategorized&quot;,&quot;name&quot;:&quot;未分类&quot;});"
                 class="btn btn-info btn-xs">编辑</a>
-            <a href="javascript:deleteTr( {{id}} );" class="btn btn-danger btn-xs">删除</a>
+            <a href="#" data-id="{{id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
         </td>
       </tr>
-    </script>
-
+    </script> -->
+ <!-- javascript:deleteTr( {{$value.id}} ); -->
   <!-- 自己的逻辑 -->
   <script>
     /*
@@ -224,14 +224,14 @@
         success: function (res) {
             console.log(res);
           if (res.code == 200) {
-            var obj = {
-              name: cateName,
-              slug: cateSlug,
-            } 
-            var html2 = template('tmp2', obj);
-            $('tbody').append(html2); 
+            // var obj = {
+            //   name: cateName,
+            //   slug: cateSlug,
+            // } 
+            // var html2 = template('tmp2', obj);
+            // $('tbody').append(html2); 
             //重新获取数据
-            //getData();//性能不高,不用
+            getData();//性能不高,不用
           }
         }
       }); 
@@ -241,21 +241,44 @@
       })
 
     //3.分类删除
-     window.deleteTr = function(id){
-        console.log(id);
-        //调用接口
-        $.ajax({
-            url: 'http://localhost:8000/admin/category_delete',
-            type: 'post',
-            data: { id : id},
-            success: function (res) {
-                 if(res.code == 200){
-                    //重新调用获取数据
-                    getData();
-                 }
+    //  window.deleteTr = function(id){
+    //     console.log(id);
+    //     //调用接口
+    //     $.ajax({
+    //         url: 'http://localhost:8000/admin/category_delete',
+    //         type: 'post',
+    //         data: { id : id},
+    //         success: function (res) {
+    //              if(res.code == 200){
+    //                 //重新调用获取数据
+    //                 getData();
+    //              }
+    //         }
+    //     })
+    //  }
+
+    //[需求]: 事件委托的方法来删除
+     $('tbody').on('click', '.btn-delete', function(e){
+            e.preventDefault();
+            console.log('删除吗');
+            if(confirm('你确认要删除吗?')){
+                //获取当前要删除的这个项的id
+                var cateId = $(this).attr('data-id');
+                //保存当前点击的这个按钮
+                var that = $(this);
+                //发送ajax请求
+                $.post({
+                    url: 'http://localhost:8000/admin/category_delete',
+                    data: {id: cateId},
+                    success: function(res){
+                       if(res.code == 200){
+                         //删除成功,刷新页面
+                          getData();
+                       }
+                    }
+                })
             }
-        })
-     }
+     })
 
   </script>
 </body>
