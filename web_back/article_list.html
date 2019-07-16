@@ -292,13 +292,13 @@
     //2.2 点击筛选-默认第一页
     $('#btnSearch').on('click', function (e) {
       e.preventDefault();
-       getData(1);
+       getData();
     })
 
    
-   //2.1 把查询页码封装成函数
-    function getData(myPage){
-         //2.1获取文章类别和文章状态
+   //2.1 把查询页码获取文章封装成函数
+    function getData(){
+      //2.1获取文章类别和文章状态
       var category = $('#selCategory').val();  // 文章类别id
       var selStatus = $('#selStatus').val();  // 文章状态
       //2.2发送ajax请求
@@ -315,18 +315,32 @@
           if (res.code == 200) {
               var resHtml = template('art_list', res);
                $('tbody').html(resHtml);
+               //3.1重置页码
+               var totalPages = res.totalPage;
+              if (myTotalPage != totalPages) {
+                // 总页数变了
+                myTotalPage = totalPages;
+                // 写死为第一页即可
+                $pagination.twbsPagination('destroy')
+                $pagination.twbsPagination(
+                  $.extend({}, defaultOpts, {
+                    startPage: 1,
+                    totalPages: totalPages,
+                  })
+                )
+              }
           }
-        }
+      }
+    })
+  }
+  
+      //3.根据分页插件的示例修改分页插件的使用
+       var myPage = 1;
+       var myTotalPage = 10;  //总页码
 
-      })
-    } 
-
-      //2.3 一进到文章列表页面,就显示所有文章
-     $('#btnSearch').trigger('click');
-
-     //2.4 分页插件
-      $('.pagination').twbsPagination({
-          totalPages: 25,
+       var $pagination = $('.pagination');
+       var defaultOpts = {
+          totalPages: myTotalPage,
           visiblePages: 5,
           first: '首页',
           last: '尾页',
@@ -334,10 +348,12 @@
           next: '下一页',
           onPageClick: function(event, page){ // 点击标签时的回调函数
              // 调用getData
-             getData(page);
-          }
-      })
-
+             myPage = page;
+             getData();
+          } 
+       }
+      $pagination.twbsPagination(defaultOpts); 
+      
   </script>
 
 
