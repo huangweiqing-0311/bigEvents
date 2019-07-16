@@ -317,6 +317,7 @@
                $('tbody').html(resHtml);
                //3.1重置页码
                var totalPages = res.totalPage;
+               //判断当前的页数和ajax查询的得到的页数是否一样,如果不一样才调用destroy方法
               if (myTotalPage != totalPages) {
                 // 总页数变了
                 myTotalPage = totalPages;
@@ -324,7 +325,7 @@
                 $pagination.twbsPagination('destroy')
                 $pagination.twbsPagination(
                   $.extend({}, defaultOpts, {
-                    startPage: 1,
+                    startPage: 1, 
                     totalPages: totalPages,
                   })
                 )
