@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/main.css" />
   <script src="js/jquery-1.12.4.min.js"></script>
   <script src="js/bootstrap/js/bootstrap.min.js"></script>
+
 </head>
 
 <body>
@@ -178,7 +179,8 @@
         4.5用事件委托的方法给编辑按钮添加点击事件,并且添加一个btn-success类,并且修改model_add文本按钮内容
         
 
-      5.点击新增按钮时,要移出弹出框的btn-success类
+      5.点击新增按钮时,要移出弹出框的btn-success类,并且清空弹出框的内容
+
         
          
            
@@ -205,8 +207,9 @@
     $('#model_add').click(function () {
 
       //2.1点击编辑-判断这个按钮是否拥有btn-success属性[有-编辑]
-      if ($(this).hasClass('btn-success')) {
-          //获取用户要修改的内容
+      if($(this).hasClass('btn-success')) {
+         
+           //获取用户要修改的内容
           // var name = $('#recipient-name').val();  // 获取分类名称
           // var slug = $('#recipient-slug').val();  //获取分类别名
           // var id = $('.modal-body .id').val();
@@ -231,29 +234,26 @@
       //2.2-获取用户输入的信息
       var cateName = $('#recipient-name').val().trim();
       var cateSlug = $('#recipient-slug').val().trim();
+
       //2.3-发送ajax请求
-      $.ajax({
+       $.ajax({
         type: 'post',
         url: 'http://localhost:8000/admin/category_add',
         data: {
           name: cateName,
           slug: cateSlug,
-        },
+            },
         success: function (res) {
             console.log(res);
           if (res.code == 200) {
-            // var obj = {
-            //   name: cateName,
-            //   slug: cateSlug,
-            // } 
-            // var html2 = template('tmp2', obj);
-            // $('tbody').append(html2); 
-            //重新获取数据
-            getData();//性能不高,不用
+            
+              //重新获取数据
+              getData(); 
+           }
           }
-        }
       }); 
-      }
+    }
+    
       //隐藏模态框        
        $('#addModal').modal('hide');
 
@@ -264,10 +264,13 @@
     $('.btnAddCate').on('click', function(){
       $('#addModal .modal-title').html('新增分类'); 
       $('#model_add').text('新增').removeClass('btn-success'); 
+
+        $('form input').val('');
+       
     })
 
-    //[需求]: 事件委托的方法编辑用户信息
-    $('tbody').on('click', '.btn-edit', function(){
+      //[需求]: 事件委托的方法编辑用户信息
+      $('tbody').on('click', '.btn-edit', function(){
         $('#addModal .modal-title').html('修改分类名称')
         $('#addModal').modal('show')
         $('#model_add').addClass('btn-success').text('修改') 
@@ -280,8 +283,9 @@
         $('.modal-body .id').val(id)
         $('#recipient-name').val(name)
         $('#recipient-slug').val(slug)
-         
-    })
+        
+        $('#addModal').modal('show'); 
+       })
     
 
     //[需求]: 事件委托的方法来删除
