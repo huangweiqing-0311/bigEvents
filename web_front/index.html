@@ -220,7 +220,44 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司   All Rights Reserved</p>
         <p>电话：0755-****888    粤ICP备*******8号</p>
     </div>
-
+   
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <!-- 导入模板引擎js文件 -->
+    <script src="./js/template-web.js"></script>
+   <!-- 创建模板 -->
+   <script type="text/html" id="tep_list">
+         {{each data v}}
+              {{if $index ==0}}
+              <li class="first">
+               {{else}}   
+               <li>
+               {{/if}}
+               <a href="article.html?id={{v.id}}"><img src="{{v.cover}}" alt=""></a>
+               <p>{{v.title}}</p>
+               </li>   
+         {{/each}}
+   </script>
+    <script>
+            $(function(){
+                 //1.一进入到前台首页,显示最新的5片焦点新闻
+                 //发送文章评论请求 
+                 $.ajax({
+                      url: 'http://localhost:8000/admin/search',
+                      data: {
+                         page: 1,
+                         perpage: 5,   
+                      },
+                      dataType: "json",  
+                      success: function(res){
+                           if(res.code == 200){
+                                console.log(res);
+                              var html = template('tep_list', res);  
+                              $('.focus_list').html(html);
+                           }
+                      }
+                 })
+            })       
+    </script>
 </body>
 
 </html>
