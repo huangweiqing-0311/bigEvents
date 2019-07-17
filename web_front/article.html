@@ -204,7 +204,44 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
         <p>电话：0755-****888 粤ICP备*******8号</p>
     </div>
-
+    
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script type="text/html" id="cate_list">
+        {{author}} 发布于 {{date}}&nbsp;&nbsp;&nbsp;分类:{{type}}&nbsp;&nbsp;&nbsp;阅读:
+        ({{read}})&nbsp;&nbsp;&nbsp;评论:({{comment}})
+    </script>
+    <script>
+           $(function(){
+                
+                //获取前台页面点击焦点新闻传递过来的id,发送ajax请求,查看文章详情
+                var id = window.location.search.split('=')[1];
+                console.log(id);
+                //发送文章搜索 请求
+                $.ajax({
+                     url: 'http://localhost:8000/admin/search',
+                     data: {
+                         state: '草稿',
+                         page: 1,
+                         perpage: 5,
+                         id: id,
+                     },
+                     success: function(res){
+                          console.log(res);
+                          if(res.code == 200){
+                             $('.article_title').html(res.data.title);
+                             $('.article_con').html(res.data.content);
+                           
+                             var content = `
+                             ${res.data.author}&nbsp;&nbsp;&nbsp; 发布于 ${res.data.date} &nbsp;&nbsp;&nbsp;分类: ${res.data.type} &nbsp;&nbsp;&nbsp;阅读: ${res.data.read} 评论: ${res.data.comment}
+                             `;
+                             $('.article_info').html(content);
+                          }
+                     }
+                     
+                })
+           })
+    </script>
 </body>
 
 </html>
