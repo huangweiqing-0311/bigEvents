@@ -204,7 +204,7 @@
           <li class="page-item prev disabled">
             <a href="#" class="page-link">上一页</a>
           </li>
-          <li class="page-item active">
+          <li class="page-item active onePage">
             <a href="#" class="page-link">1</a>
           </li>
           <li class="page-item"><a href="#" class="page-link">2</a></li>
@@ -250,8 +250,8 @@
               <td class="text-center">{{v.date}}</td>
               <td class="text-center">{{v.state}}</td>
               <td class="text-center">
-                <a href="./article_edit.html" data-id="{{v.id}}" class="btn btn-default btn-xs">编辑</a>
-                <a href="#" data-id="{{v.id}}" class="btn btn-danger btn-xs">删除</a>
+                <a href="./article_edit.html?id={{v.id}}" class="btn btn-default btn-xs">编辑</a>
+                <a href="#" data-id="{{v.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
               </td>
             </tr>
            {{/each}}
@@ -282,61 +282,16 @@
       url: 'http://localhost:8000/admin/category_search',
       success: function (res) {
         if (res.code == 200) {
-
+           console.log(res);
           var html = template('article', res);
           $('#selCategory').html(html);
         }
       }
     })
 
-    //2.2 点击筛选-默认第一页
-    $('#btnSearch').on('click', function (e) {
-      e.preventDefault();
-       getData();
-    })
-
-   
-   //2.1 把查询页码获取文章封装成函数
-    function getData(){
-      //2.1获取文章类别和文章状态
-      var category = $('#selCategory').val();  // 文章类别id
-      var selStatus = $('#selStatus').val();  // 文章状态
-      //2.2发送ajax请求
-      $.ajax({
-        url: 'http://localhost:8000/admin/search',
-        data: {
-          type: category,
-          state: selStatus,
-          page: myPage,
-          perpage: 6,
-        },
-        success: function (res) {
-          console.log(res);
-          if (res.code == 200) {
-              var resHtml = template('art_list', res);
-               $('tbody').html(resHtml);
-               //3.1重置页码
-               var totalPages = res.totalPage;
-               //判断当前的页数和ajax查询的得到的页数是否一样,如果不一样才调用destroy方法
-              if (myTotalPage != totalPages) {
-                // 总页数变了
-                myTotalPage = totalPages;
-                // 写死为第一页即可
-                $pagination.twbsPagination('destroy')
-                $pagination.twbsPagination(
-                  $.extend({}, defaultOpts, {
-                    startPage: 1, 
-                    totalPages: totalPages,
-                  })
-                )
-              }
-          }
-      }
-    })
-  }
-  
-      //3.根据分页插件的示例修改分页插件的使用
-       var myPage = 1;
+    
+   //3.根据分页插件的示例修改分页插件的使用
+       
        var myTotalPage = 10;  //总页码
 
        var $pagination = $('.pagination');
@@ -349,11 +304,89 @@
           next: '下一页',
           onPageClick: function(event, page){ // 点击标签时的回调函数
              // 调用getData
-             myPage = page;
-             getData();
+            getData(page);
           } 
        }
       $pagination.twbsPagination(defaultOpts); 
+
+   
+   //2.1 把查询页码获取文章封装成函数
+    function getData(myPage){
+      //2.1获取文章类别和文章状态
+      var category = $('#selCategory').val();  // 文章类别id
+      var selStatus = $('#selStatus').val();  // 文章状态
+      //2.2发送ajax请求
+      $.ajax({
+        url: 'http://localhost:8000/admin/search',
+        data: {
+          type: category,
+          state: selStatus,
+          page: myPage,
+          perpage: 5,
+        },
+        success: function (res) {
+          //console.log(res);
+          if (res.code == 200) {
+              var resHtml = template('art_list', res);
+               $('tbody').html(resHtml);
+
+               //3.1 获取新的总页数
+               var totalPages = res.totalPage;
+
+               //3.3 把当前页暴露出去
+               window.currentPage = $pagination.twbsPagination('getCurrentPage'); // 当前页
+
+               //判断当前的页数和ajax查询的得到的页数是否一样,如果不一样才调用destroy方法
+              if (myTotalPage != totalPages) {
+                //3.2 获取到新的总页数,赋值给我们声明的变量
+                myTotalPage = totalPages;
+
+                // 写死为第一页即可
+                $pagination.twbsPagination('destroy')
+                $pagination.twbsPagination($.extend({}, defaultOpts, {
+                    startPage: 1, 
+                    totalPages: totalPages,
+                  })
+                )
+              }
+          }
+      }
+    })
+  } 
+
+   //2.2 点击筛选-默认第一页
+   $('#btnSearch').on('click', function (e) {
+      e.preventDefault();
+       getData(1);
+       $('.page-link').trigger('click');
+    })
+  
+        //4.删除文章
+      //给模板里面的删除按钮注册委托事件
+      $('tbody').on('click', '.btn-delete', function(e){
+          e.preventDefault();
+          //保存当前点击的这个删除按钮
+          var that = this;
+          //获取当前删除按钮的id
+          var id = $(this).attr('data-id');
+          //发送ajax请求
+          $.get({
+              url: 'http://localhost:8000/admin/article_delete',
+              data: { id: id},
+              success: function(res){
+                     if(res.code == 200){
+                        getData(currentPage);
+                        
+                        //直接操作dom,删除当前页会把当前的一行都删除掉
+                        // that.parents('tr').remove();
+                     }
+              }
+          })
+      })
+
+       
+
+      
       
   </script>
 
